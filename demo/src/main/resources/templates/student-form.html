@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${student.id != null} ? 'Редактирование студента' : 'Добавление студента'"></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Кнопки */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .primary:hover {
+            background-color: #2980b9;
+        }
+
+        .back {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .back:hover {
+            background-color: #7f8c8d;
+        }
+
+        .edit {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .edit:hover {
+            background-color: #e67e22;
+        }
+
+        .delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .delete:hover {
+            background-color: #c0392b;
+        }
+
+        /* Формы */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Таблица */
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .students-table th,
+        .students-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .students-table th {
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+
+        .students-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Детали студента */
+        .student-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            min-width: 150px;
+            color: #2c3e50;
+        }
+
+        /* Сообщения */
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Поиск */
+        .search-form {
+            margin: 20px 0;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-form form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-form input {
+            flex: 1;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .actions .button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${student.id != null} ? 'Редактирование студента' : 'Добавление студента'"></h1>
+
+    <a th:href="@{/students}" class="button back">← Назад к списку</a>
+
+    <form th:object="${student}" th:action="${student.id != null} ?
+              @{/students/update/{id}(id=${student.id})} : @{/students}"
+          method="post" class="student-form">
+
+        <div class="form-group">
+            <label>Фамилия *</label>
+            <input type="text" th:field="*{lastName}" required>
+            <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Имя *</label>
+            <input type="text" th:field="*{firstName}" required>
+            <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Отчество</label>
+            <input type="text" th:field="*{middleName}">
+        </div>
+
+        <div class="form-group">
+            <label>Пол *</label>
+            <select th:field="*{gender}" required>
+                <option value="">Выберите пол</option>
+                <option value="Мужской">Мужской</option>
+                <option value="Женский">Женский</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Национальность *</label>
+            <input type="text" th:field="*{nationality}" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Рост (см) *</label>
+                <input type="number" th:field="*{height}" min="100" max="250" required>
+            </div>
+
+            <div class="form-group">
+                <label>Вес (кг) *</label>
+                <input type="number" th:field="*{weight}" min="30" max="200" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Дата рождения *</label>
+            <input type="date" th:field="*{birthDate}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Номер телефона *</label>
+            <input type="tel" th:field="*{phoneNumber}" placeholder="+7 (XXX) XXX-XX-XX" required>
+            <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" class="error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>ВУЗ *</label>
+            <input type="text" th:field="*{university}" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Курс *</label>
+                <input type="number" th:field="*{course}" min="1" max="6" required>
+            </div>
+
+            <div class="form-group">
+                <label>Группа *</label>
+                <input type="text" th:field="*{groupName}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Средний балл *</label>
+            <input type="number" th:field="*{averageGrade}" step="0.01" min="2.0" max="5.0" required>
+        </div>
+
+        <div class="form-group">
+            <label>Специальность *</label>
+            <input type="text" th:field="*{specialty}" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="button primary">
+                <span th:text="${student.id != null} ? 'Обновить' : 'Добавить'"></span>
+            </button>
+            <a th:href="@{/students}" class="button">Отмена</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

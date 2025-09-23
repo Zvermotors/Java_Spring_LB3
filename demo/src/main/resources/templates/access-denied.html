@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доступ запрещен</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1 class="text-center">⛔ Доступ запрещен</h1>
+
+        <div class="alert alert-error">
+            <p>У вас недостаточно прав для доступа к этой странице.</p>
+        </div>
+
+        <div class="text-center">
+            <p>Обратитесь к администратору для получения доступа.</p>
+            <a th:href="@{/students}" class="btn btn-primary">Вернуться к списку студентов</a>
+            <a th:href="@{/logout}" class="btn btn-secondary">Выйти</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
